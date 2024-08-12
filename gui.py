@@ -29,22 +29,17 @@ class QRCodeScannerApp:
         self.update_frame()
 
     def create_widgets(self):
-        # Create a style for ttk widgets
-        style = ttk.Style()
-        style.configure("TButton", font=("Kanit", 12), padding=6)
-        style.configure("TLabel", font=("Kanit", 12), background="#f0f0f0")
-
         # Configure grid weights for responsiveness
         self.root.grid_rowconfigure(1, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
 
         # User data display
-        self.user_label = ttk.Label(self.root, text="ชื่อพนักงาน :  ")
-        self.user_label.grid(row=0, column=0, padx=(20, 10), pady=(15,5), sticky="w")
+        self.user_label = tk.Label(self.root, text="ชื่อพนักงาน :  ", font=("Kanit", 15), bg="#f0f0f0")
+        self.user_label.grid(row=0, column=0, padx=(20, 10), pady=(15, 5), sticky="w")
 
-        self.department = ttk.Label(self.root, text="แผนก :  ")
-        self.department.grid(row=0, column=1, padx=(20, 10), pady=(15,5), sticky="w")
+        self.department = tk.Label(self.root, text="แผนก : เตา 1", font=("Kanit", 15), bg="#f0f0f0")
+        self.department.grid(row=0, column=1, padx=(20, 20), pady=(15, 5), sticky="e")
 
         # Video frame with border
         self.video_frame = tk.Frame(self.root, bg="black", borderwidth=2, relief="solid")
@@ -63,44 +58,36 @@ class QRCodeScannerApp:
         self.qr_listbox_frame.grid(row=1, column=1, padx=(20, 20), pady=(0, 20), sticky="nsew")
 
         # Mode toggle button
-        self.mode_button = ttk.Button(self.root, text="Switch to QR Code Mode", command=self.toggle_mode)
+        self.mode_button = tk.Button(self.root, text="โหมดสแกนชื่อพนักงาน", font=("Kanit", 14), command=self.toggle_mode,bg="#3d85c6")
         self.mode_button.grid(row=2, column=0, padx=(20, 0), pady=30, sticky="ew")
 
         # Buttons at the bottom of the QR list
-        buttons_frame = ttk.Frame(self.root, style="TFrame")
-        buttons_frame.grid(row=2, column=1, padx=(20, 20), pady=30, sticky="ew")
+        self.buttons_frame = tk.Frame(self.root, bg="#f0f0f0")
+        self.buttons_frame.grid(row=2, column=1, padx=(20, 20), pady=30, sticky="ew")
 
-        clear_button = ttk.Button(buttons_frame, text="Clear All", command=self.clear_all)
-        clear_button.pack(side='left', padx=(0))
-
-        send_button = ttk.Button(buttons_frame, text="Send Data", command=self.send_data)
-        send_button.pack(side='right', padx=(5, 0))
-        
-        # Mode toggle button
-        self.mode_button = ttk.Button(self.root, text="โหมดสแกนชื่อพนักงาน", command=self.toggle_mode)
-        self.mode_button.grid(row=2, column=0, padx=(20, 0), pady=30, sticky="ew")
-
-        # Buttons at the bottom of the QR list
-        buttons_frame = ttk.Frame(self.root, style="TFrame")
-        buttons_frame.grid(row=2, column=1, padx=(20, 20), pady=30, sticky="ew")
-
-        self.clear_button = ttk.Button(buttons_frame, text="Clear All", command=self.clear_all)
+        # Clear button with red style
+        self.clear_button = tk.Button(self.buttons_frame, text="Clear All", command=self.clear_all, bg="#cc0000", fg="white", font=("Kanit", 14), width=15)
         self.clear_button.pack(side='left', padx=(0))
 
-        self.send_button = ttk.Button(buttons_frame, text="Send Data", command=self.send_data)
+        # Send button with green style
+        self.send_button = tk.Button(self.buttons_frame, text="Send Data", command=self.send_data, bg="#6aa84f", fg="white", font=("Kanit", 14), width=15)
         self.send_button.pack(side='right', padx=(5, 0))
 
         # Initialize button states based on the default mode
         self.update_button_states()
+
+
 
     def toggle_mode(self):
         """Toggle between scanning QR Code data and user data."""
         if self.current_mode == "Scan QR Code":
             self.current_mode = "Scan User Data"
             self.mode_button.config(text="โหมดสแกนชื่อพนักงาน")
+            self.mode_button.config(bg="#3d85c6")
         else:
             self.current_mode = "Scan QR Code"
-            self.mode_button.config(text="โหมดสแกนงาน")
+            self.mode_button.config(text="โหมดสแกนกระจก")
+            self.mode_button.config(bg="#f1c232")
 
         # Update button states based on the current mode
         self.update_button_states()
@@ -168,11 +155,11 @@ class QRCodeScannerApp:
 
     def add_qr_to_frame(self, qr_data):
         """Add a QR data label and delete button to the frame."""
-        qr_frame = ttk.Frame(self.qr_listbox_frame, padding=5)
+        qr_frame = tk.Frame(self.qr_listbox_frame)
         qr_label = ttk.Label(qr_frame, text=qr_data, anchor='w', font=("Helvetica", 10))
-        delete_button = ttk.Button(qr_frame, text="X", command=lambda: self.delete_qr(qr_data, qr_frame))
-
         qr_label.pack(side='left', fill='x', expand=True)
+        
+        delete_button = tk.Button(qr_frame, text="X", command=lambda: self.delete_qr(qr_data, qr_frame), bg="#cc0000", fg="white", font=("Kanit", 14))
         delete_button.pack(side='right')
 
         qr_frame.pack(fill='x', padx=5, pady=3)
@@ -184,23 +171,23 @@ class QRCodeScannerApp:
 
     def send_data(self):
         """Send the scanned QR data for further processing."""
-        if self.scanned_qr_data:
+        if self.scanned_qr_data and self.latest_user_data:
             # Here you would send the data to an external system or process it.
             print("Sending data:", self.scanned_qr_data)
             
             # Display a message box indicating success
-            messagebox.showinfo("Success", "Data sent successfully!")
+            messagebox.showinfo("Success", "ส่งข้อมูลไปยัง Appsheet สำเร็จ!")
             
             # Clear the scanned QR data
             self.clear_all()  # Use the existing clear_all method to reset the UI and data
+        else:  
+            messagebox.showerror("Error", "ไม่พบข้อมูลการสแกนหรือชื่อพนักงาน!")
 
     def clear_all(self):
         """Clear all QR data entries from the UI and the set."""
         for widget in self.qr_listbox_frame.winfo_children():
             widget.destroy()
         self.scanned_qr_data.clear()
-
-
 
     def __del__(self):
         # Release resources
