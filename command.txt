@@ -1,0 +1,1 @@
+pyinstaller --onefile --noconsole --add-binary "./libiconv.dll;." --add-binary "./libzbar-64.dll;." gui.py
