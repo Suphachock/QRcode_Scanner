@@ -8,7 +8,7 @@ from tkinter import messagebox
 class QRCodeScannerApp:
     def __init__(self, root):
         # Initialize camera and font
-        self.camera_id = 1
+        self.camera_id = 0
         self.cap = cv2.VideoCapture(self.camera_id)
         self.scanned_qr_data = set()
         self.current_mode = "Scan User Data"  # Default mode
