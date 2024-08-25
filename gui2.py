@@ -11,7 +11,7 @@ class SimpleApp:
         self.root.state("zoomed")
         
         # Initialize camera and scanned QR data set
-        self.cap = cv2.VideoCapture(1)  # Use camera ID 1 as per your original code
+        self.cap = cv2.VideoCapture(0)  # Use camera ID 1 as per your original code
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         
