@@ -1,0 +1,6 @@
+opencv-python-headless
+pyzbar
+Pillow
+tkinter
+RPi.GPIO; platform_system == "Linux"
+picamera2; platform_system == "Linux"
