@@ -4,21 +4,40 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import sys
+if sys.platform == 'linux':
+    from picamera2 import Picamera2
+    import RPi.GPIO as GPIO
+
 
 class QRCodeScannerApp:
     def __init__(self, root):
-        # Initialize camera and font
-        self.camera_id = 0
-        self.cap = cv2.VideoCapture(self.camera_id)
+        # Initialize camera based on platform
+        if sys.platform == 'linux':
+            self.cap = Picamera2()
+            self.cap.configure(self.cap.create_preview_configuration(main={"size": (640, 480)}))
+            self.cap.start()
+            
+            # Initialize GPIO for buttons
+            GPIO.setmode(GPIO.BCM)  # Use BCM numbering
+            self.mode_button_pin = 17  # Choose your GPIO pin
+            self.clear_button_pin = 27
+            self.send_button_pin = 22
+
+            GPIO.setup(self.mode_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.clear_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.send_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+            # Add GPIO event detection for button presses
+            GPIO.add_event_detect(self.mode_button_pin, GPIO.FALLING, callback=self.toggle_mode, bouncetime=300)
+            GPIO.add_event_detect(self.clear_button_pin, GPIO.FALLING, callback=lambda channel: self.clear_all(), bouncetime=300)
+            GPIO.add_event_detect(self.send_button_pin, GPIO.FALLING, callback=lambda channel: self.send_data(), bouncetime=300)
+
+        else:
+            self.cap = cv2.VideoCapture(0)  # Use default camera on Windows
         self.scanned_qr_data = set()
         self.current_mode = "Scan User Data"  # Default mode
         self.latest_user_data = ""  # Store the latest user data
-
-        # Initialize font (with error handling)
-        try:
-            self.font = ImageFont.truetype("arial.ttf", 20)
-        except IOError:
-            self.font = ImageFont.load_default()  # Use default font if not found
 
         # Set up the GUI
         self.root = root
@@ -105,9 +124,12 @@ class QRCodeScannerApp:
 
     def update_frame(self):
         """Capture and process each video frame."""
-        ret, frame = self.cap.read()
-        if not ret:
-            return  # If frame capture fails, return
+        if sys.platform == 'linux':
+            frame = self.cap.capture_array()
+        else:
+            ret, frame = self.cap.read()
+            if not ret:
+                return  # If frame capture fails, return
 
         # Get the current size of the video label
         frame_width = self.video_label.winfo_width() or 640
@@ -190,7 +212,8 @@ class QRCodeScannerApp:
         self.scanned_qr_data.clear()
 
     def __del__(self):
-        # Release resources
+        if sys.platform == 'linux':
+            GPIO.cleanup()  # Clean up GPIO resources
         self.cap.release()
         cv2.destroyAllWindows()
 

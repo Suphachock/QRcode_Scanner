@@ -51,6 +51,7 @@ class SimpleApp:
         
         self.send_button = tk.Button(self.button_frame, text="Send Data", bg="#6aa84f", fg="white", font=("Kanit", 20), width=15)
         self.send_button.pack(side='right')
+        
         # --------------------------------------------------------
 
         # Configure row and column weights for resizing
