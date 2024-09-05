@@ -164,16 +164,8 @@ class QRCodeScannerApp:
         qr_frame = ttk.Frame(self.qr_listbox_frame)
         qr_label = ttk.Label(qr_frame, text=qr_data, anchor='w', font=("Helvetica", 16))
         qr_label.pack(side='left', fill='x', expand=True)
-
-        # delete_button = ttk.Button(qr_frame, text="X", command=lambda: self.delete_qr(qr_data, qr_frame), bootstyle="danger", width=2)
-        # delete_button.pack(side='right')
-
         qr_frame.pack(fill='x', padx=5, pady=3)
 
-    # def delete_qr(self, qr_data, qr_frame):
-    #     """Delete the QR data from the frame and set."""
-    #     qr_frame.destroy()
-    #     self.scanned_qr_data.discard(qr_data)
 
     def send_data(self):
         """Send the scanned QR data for further processing."""
